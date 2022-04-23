@@ -30,7 +30,7 @@ services:
       GOTRUE_OPERATOR_TOKEN: ${GOTRUE_OPERATOR_TOKEN}
 
       GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/?sslmode=disable&search_path=auth
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable&search_path=auth
 
       GOTRUE_SITE_URL: ${GOTRUE_SITE_URL}
       GOTRUE_DISABLE_SIGNUP: ${GOTRUE_DISABLE_SIGNUP}
@@ -58,10 +58,10 @@ services:
     depends_on:
       - db
     environment:
-      - DB_HOST=db
-      - DB_NAME=postgres
-      - DB_USER=postgres
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      DB_HOST: db
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: postgres
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
   db:
     container_name: postgres
     image: postgres:14
@@ -70,4 +70,5 @@ services:
       - ./.volumes/postgres/data:/var/lib/postgresql/data
       - ./.volumes/postgres/init:/docker-entrypoint-initdb.d
     environment:
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
