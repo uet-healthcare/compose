@@ -1,0 +1,45 @@
+_format_version: "2.1"
+
+services:
+  - name: auth-v1
+    url: http://auth:8081/
+    plugins:
+      - name: cors
+    routes:
+      - name: auth-v1-all
+        paths:
+          - /auth/v1/
+
+  - name: api-v1-private
+    url: http://main:80/private/
+    plugins:
+      - name: cors
+      - name: jwt
+        config:
+          key_claim_name: aud
+          secret_is_base64: false
+          run_on_preflight: true
+    routes:
+      - name: api-v1-private
+        paths:
+          - /api/v1/private/
+
+  - name: api-v1-public
+    url: http://main:80/public
+    plugins:
+      - name: cors
+    routes:
+      - name: api-v1-public
+        paths:
+          - /api/v1/public/
+
+plugins:
+  - name: prometheus
+
+consumers:
+  - username: vietlach
+
+jwt_secrets:
+  - consumer: vietlach
+    key: KONG_JWT_SECRETS_MAIN_KEY
+    secret: KONG_JWT_SECRETS_MAIN_SECRET
