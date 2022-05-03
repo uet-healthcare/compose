@@ -18,6 +18,16 @@ services:
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+  db:
+    container_name: postgres
+    image: postgres:14
+    restart: unless-stopped
+    volumes:
+      - ./.volumes/postgres/data:/var/lib/postgresql/data
+      - ./.volumes/postgres/init:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
   auth:
     container_name: gotrue
     build: https://github.com/netlify/gotrue.git#v1.0.1
@@ -54,21 +64,46 @@ services:
   main:
     image: vietlach-backend:0.0.1
     build: ../vietlach-backend
-    restart: unless-stopped
     depends_on:
       - db
+    restart: unless-stopped
     environment:
       DB_HOST: db
       DB_NAME: ${POSTGRES_DB}
       DB_USER: postgres
       DB_PASSWORD: ${POSTGRES_PASSWORD}
-  db:
-    container_name: postgres
-    image: postgres:14
+  postgrest:
+    container_name: postgrest
+    image: postgrest/postgrest:v9.0.0
+    depends_on:
+      - db
     restart: unless-stopped
-    volumes:
-      - ./.volumes/postgres/data:/var/lib/postgresql/data
-      - ./.volumes/postgres/init:/docker-entrypoint-initdb.d
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable
+      PGRST_DB_SCHEMAS: public,storage
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${GOTRUE_JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+  storage:
+    container_name: storage
+    build: ../storage-api
+    depends_on:
+      - db
+      - postgrest
+    restart: unless-stopped
+    environment:
+      ANON_KEY: ${STORAGE_ANON_KEY}
+      SERVICE_KEY: ${STORAGE_SERVICE_KEY}
+      POSTGREST_URL: http://postgrest:3000
+      PGRST_JWT_SECRET: ${GOTRUE_JWT_SECRET}
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable
+      PGOPTIONS: -c search_path=storage,public
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      # TODO: https://github.com/supabase/storage-api/issues/55
+      REGION: stub
+      GLOBAL_S3_BUCKET: stub
+    volumes:
+      - ./volumes/storage:/var/lib/storage

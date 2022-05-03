@@ -33,6 +33,16 @@ services:
         paths:
           - /api/v1/public/
 
+  - name: storage-v1
+    url: http://storage:5000/
+    plugins:
+      - name: cors
+    routes:
+      - name: storage-v1-all
+        strip_path: true
+        paths:
+          - /storage/v1/
+
 plugins:
   - name: prometheus
 

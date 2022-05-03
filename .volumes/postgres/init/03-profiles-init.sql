@@ -1,5 +1,5 @@
 CREATE TABLE public.profiles (
-	user_id varchar(255) references auth.users not null,
+	user_id uuid references auth.users not null,
 	username varchar(255) unique,
 	PRIMARY KEY (user_id)
 );
