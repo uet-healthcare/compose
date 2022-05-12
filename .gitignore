@@ -3,3 +3,4 @@
 .volumes/storage/.aws/credentials
 .DS_Store
 .env*
+.volumes/kong/kong.yml
