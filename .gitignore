@@ -1,3 +1,4 @@
 .volumes/postgres/data/*
+.volumes/storage/.aws
 .DS_Store
 .env*
