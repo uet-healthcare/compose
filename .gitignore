@@ -1,4 +1,4 @@
-.volumes/postgres/data/*
+.volumes/postgres/data
 .volumes/storage/.aws/config
 .volumes/storage/.aws/credentials
 .DS_Store
