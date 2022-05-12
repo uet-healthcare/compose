@@ -99,11 +99,12 @@ services:
       DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable
       PGOPTIONS: -c search_path=storage,public
       FILE_SIZE_LIMIT: 52428800
-      STORAGE_BACKEND: file
-      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
-      TENANT_ID: stub
       # TODO: https://github.com/supabase/storage-api/issues/55
-      REGION: stub
-      GLOBAL_S3_BUCKET: stub
+      STORAGE_BACKEND: ${STORAGE_BACKEND}
+      TENANT_ID: ${STORAGE_TENANT_ID}
+      REGION: ${STORAGE_REGION}
+      GLOBAL_S3_BUCKET: ${STORAGE_GLOBAL_S3_BUCKET}
+      # FILE_STORAGE_BACKEND_PATH: /var/lib/storage
     volumes:
-      - ./volumes/storage:/var/lib/storage
+      # - ./.volumes/storage:/var/lib/storage
+      - ./.volumes/storage/.aws:/root/.aws

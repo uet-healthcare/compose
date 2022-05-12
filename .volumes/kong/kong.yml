@@ -52,4 +52,4 @@ consumers:
 jwt_secrets:
   - consumer: vietlach
     key: KONG_JWT_SECRETS_MAIN_KEY
-    secret: KONG_JWT_SECRETS_MAIN_SECRET
+    secret: wXM6j1/tIquCmy/y78f3gUaBRCLzsh8iMXGlhUlPXhA=
