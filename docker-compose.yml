@@ -22,6 +22,8 @@ services:
     container_name: postgres
     image: postgres:14
     restart: unless-stopped
+    ports:
+      - 5432:5432/tcp
     volumes:
       - ./.volumes/postgres/data:/var/lib/postgresql/data
       - ./.volumes/postgres/init:/docker-entrypoint-initdb.d
@@ -62,8 +64,8 @@ services:
       GOTRUE_SMTP_USER: ${GOTRUE_SMTP_USER}
       GOTRUE_SMTP_PASS: ${GOTRUE_SMTP_PASS}
   main:
-    image: vietlach-backend:0.0.1
-    build: ../vietlach-backend
+    image: backend-healthcare:0.0.1
+    build: https://github.com/supabase/storage-api.git#v0.16.5
     depends_on:
       - db
     restart: unless-stopped
